@@ -1,17 +1,13 @@
-import json
-from datetime import timedelta
-
+import os
 from googleapiclient.discovery import build
-import time
 
+# Set the path to your service account key file
+cred = os.getenv("ServiceAcct")
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "Path/To/Json"
 
-# Replace with your API key
+# Build the YouTube service using the credentials
+youtube = build('youtube', 'v3')
 
-youtube = build('youtube', 'v3', developerKey=api_key)
-
-
-# Function to get 500 items (Timing is different each time, depending on connection and other factors.)
-# I average a ~ 30 second parse
 def parse(query):
     items = []
     next_page_token = None
@@ -26,7 +22,6 @@ def parse(query):
         )
         response = request.execute()
 
-        # Get view counts for each video in the current batch
         for item in response['items']:
             video_id = item['id']['videoId']
             video_request = youtube.videos().list(
@@ -42,16 +37,10 @@ def parse(query):
         if not next_page_token:
             break
 
-    # Limit to 500 items
     return items[:500]
 
-start = time.time()
-jsoned = parse("tf2 gambling")
-
-with open('youtube_items.json', 'w') as json_file:
-    json.dump(jsoned, json_file, indent=4)
-
-end = time.time()
-time_lapsed = end - start
-timer = str(time_lapsed)
-print("Exported 500 items to youtube_items.json in " + timer)
+# Example usage
+query = "your_search_query"
+items = parse(query)
+for item in items:
+    print(f"Title: {item['snippet']['title']}, Views: {item['viewCount']}")

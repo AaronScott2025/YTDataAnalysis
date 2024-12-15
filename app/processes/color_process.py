@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score
 #print(plt.style.available)
 
 # Load the dataset
-data = pd.read_csv("RGBSet.csv")
+data = pd.read_csv("../datasets/RGBSet.csv")
 
 # Extract features and labels
 X = data[['R', 'G', 'B']].values
@@ -25,7 +25,7 @@ knn.fit(X_train, y_train)
 # Make predictions
 y_pred = knn.predict(X_test)
 
-# Model evaluation
+# app evaluation
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy with k=4:", accuracy * 100)
 

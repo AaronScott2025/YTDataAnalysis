@@ -31,7 +31,7 @@ def record_color(event=None):
     if color_letter in color_map:
         color_name = color_map[color_letter]
         r, g, b = color_display.rgb
-        with open('RGBSet.csv', 'a', newline='') as csvfile:
+        with open('../datasets/RGBSet.csv', 'a', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow([r, g, b, color_name])
         status_label.config(text=f"Recorded: {r},{g},{b},{color_name}")
