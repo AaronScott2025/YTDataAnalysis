@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Screen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div id="data-screen" class="screen active">
+        <h1>Query Results</h1>
+        <div id="graph-container">
+            <canvas id="graph"></canvas>
+        </div>
+        <div id="data-container">
+            <h2>Data Details</h2>
+            <ul id="data-list"></ul>
+        </div>
+        <a href="{{ url_for('main_gui') }}" id="back-button">Back</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='info_screen.js') }}"></script>
+</body>
+</html>
