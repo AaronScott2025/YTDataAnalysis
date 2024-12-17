@@ -1,4 +1,7 @@
 from flask import Flask, render_template, request, jsonify
+from pytz.exceptions import Error
+
+import app.processes.youtube as yt
 
 app = Flask(__name__)
 
@@ -13,7 +16,11 @@ def info_screen():
 @app.route('/api/query')
 def query_api():
     query = request.args.get('query')
-    # Example data
+    try:
+        jsonfile = yt.parse(query)
+    except:
+        RuntimeError("Error parsing query, please check your connection, and try again.")
+
     graph_data = {
         "labels": ["A", "B", "C", "D"],
         "values": [10, 20, 30, 40],
