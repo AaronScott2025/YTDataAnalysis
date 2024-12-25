@@ -1,8 +1,6 @@
 from collections import Counter
-import time
 from flask import Flask, render_template, request, jsonify, Response
-import app.processes.youtube as yt  # Assuming this is used elsewhere
-
+import app.processes.youtube as yt
 app = Flask(__name__)
 
 # Main GUI route
@@ -15,66 +13,47 @@ def main_gui():
 def info_screen():
     return render_template('InfoScreen.html')
 
-# Streaming updates
-@app.route('/stream')
-def stream():
-    def event_stream():
-        yield "data: Starting query processing\n\n"
-        time.sleep(1)  # Simulate delay
+# Main process route
+@app.route('/querydata', methods=['GET'])
+def query_api():
+    query = request.args.get('query', '').strip()
+    slider = request.args.get('slider')
 
-        query = request.args.get('query', 'default_query')
-        slider = request.args.get('slider', 'Moderate')
+    if not query:
+        return jsonify({"error": "Query cannot be empty"}), 400
 
-        precision = {
-            "Broad": 25,
-            "Moderate": 15,
-            "Precise": 10
-        }.get(slider, "error")
+    precision = {
+        "Broad": 25,
+        "Moderate": 15,
+        "Precise": 10
+    }.get(slider)
 
-        if precision == "error":
-            yield "data: Error: Invalid slider value\n\n"
-            return
+    if precision is None:
+        return jsonify({"error": "Invalid slider value"}), 400
 
-        yield f"data: Query received: {query}\n\n"
-        yield f"data: Precision set to: {precision}\n\n"
+    try:
+        title = Counter()
+        descriptions = Counter()
+        colors = Counter()
 
-        time.sleep(1)  # Simulate delay
-        yield "data: Parsing query...\n\n"
+        # Parse and process videos
+        vidWeights = yt.parse_and_process(query, title, descriptions, colors)
 
-        try:
-            jsonfile = [
-                {"title": "Video 1", "weight": 20, "color": "blue", "description": "A sample video"},
-                {"title": "Video 2", "weight": 15, "color": "red", "description": "Another video"}
-            ]
-            time.sleep(1)
-        except Exception as e:
-            yield f"data: Error: {str(e)}\n\n"
-            return
+        # Ensure sorting won't fail
+        vidWeights.sort(key=lambda x: getattr(x, 'weight', 0), reverse=True)
 
-        yield "data: Processing videos...\n\n"
-        vidWeights = []
-        title_counter = Counter()
-        descriptions_counter = Counter()
-        colors_counter = Counter()
+        # Prepare graph data
+        graph_data = {
+            "labels": [f"Video {i}" for i in range(1, len(vidWeights) + 1)],
+            "values": [video.weight for video in vidWeights],
+            "label": "Video Weights"
+        }
+        details = [f"Video {i}: {query}" for i in range(1, len(vidWeights) + 1)]
 
-        for item in jsonfile:
-            title_counter.update(item['title'].split())
-            descriptions_counter.update(item['description'].split())
-            colors_counter.update([item['color']])
-            vidWeights.append({
-                "weight": item['weight'],
-                "title": item['title'],
-                "color": item['color']
-            })
-            yield f"data: Processed video: {item['title']}\n\n"
-            time.sleep(0.5)
+        return jsonify({"graphData": graph_data, "details": details})
+    except Exception as e:
+        return jsonify({"error": f"Processing error: {str(e)}"}), 500
 
-        yield "data: Generating graph data...\n\n"
-        time.sleep(1)
-
-        yield "data: Processing complete\n\n"
-
-    return Response(event_stream(), content_type='text/event-stream')
-
+# Run the application
 if __name__ == '__main__':
     app.run(debug=False)

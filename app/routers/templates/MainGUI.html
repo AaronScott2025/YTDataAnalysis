@@ -3,19 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Youtube Creative Assistant</title>
+    <title>YouTube Creativity Assistant</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+
     <div id="query-screen" class="screen active">
         <h1>Enter Your Query</h1>
         <form id="query-form">
+            <label for="query-input">Query:</label>
             <input type="text" id="query-input" placeholder="Type your query here" required>
+
+            <label for="myRange">     Precision Level:</label>
             <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-            <p>Value: <span id="demo">Moderate</span></p>
+            <p>Precision: <span id="demo">Moderate</span></p>
+
             <button type="submit">Process</button>
         </form>
     </div>
+
+    <div id="loading-screen" class="screen inactive">
+        <h1>Loading, please wait...</h1>
+    </div>
+
     <script src="{{ url_for('static', filename='main_gui.js') }}"></script>
+
 </body>
 </html>
