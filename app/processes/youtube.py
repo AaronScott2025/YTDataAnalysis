@@ -8,7 +8,7 @@ from app.DataClasses import videoItem
 
 # Set the path to your service account key file
 cred = os.getenv("ServiceAcct")
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "path/to/service_account_key.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = "C:/Users/aaron/Downloads/gen-lang-client-0645691485-55f5e55d5b80.json"
 
 # Build the YouTube service using the credentials
 youtube = build('youtube', 'v3')
